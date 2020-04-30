@@ -124,10 +124,8 @@ for i in range(100):
 		[".", ".", "."]
 	]
 	while is_terminal(board) == False:
-
-		# human_y = int(input("Enter y: ")) - 1 # convert to board indices
-		# human_x = int(input("Enter x: ")) - 1 # convert to board indices
-		ai1_y, ai1_x, human_score = minimax(board, 3, False)
+	
+		ai1_y, ai1_x, human_score = minimax(board, 3, True)
 		make_move(board, ai1_y, ai1_x, human) # ai1
 		display(board)
 		
@@ -149,7 +147,7 @@ for i in range(100):
 		else:
 			pass
 			
-		ai_y, ai_x, score = minimax(board, 3, True) # ai2
+		ai_y, ai_x, score = minimax(board, 3, False) # ai2
 		make_move(board, ai_y, ai_x, ai)
 		display(board)
 		
@@ -171,4 +169,5 @@ for i in range(100):
 		else:
 			pass
 			
-print (num_draws, ai_1_wins, ai_2_wins)
+print ("{:<15}{:<15}{:<15}".format("Draws", "AI 1 Wins", "AI 2 Wins"))
+print ("{:<15}{:<15}{:<15}".format(num_draws, ai_1_wins, ai_2_wins))
