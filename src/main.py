@@ -129,7 +129,7 @@ for i in range(100):
 		# human_x = int(input("Enter x: ")) - 1 # convert to board indices
 		ai1_y, ai1_x, human_score = minimax(board, 3, False)
 		make_move(board, ai1_y, ai1_x, human) # ai1
-		# display(board)
+		display(board)
 		
 		ai_win = is_winner(board, ai)
 		human_win = is_winner(board, human)
@@ -151,7 +151,7 @@ for i in range(100):
 			
 		ai_y, ai_x, score = minimax(board, 3, True) # ai2
 		make_move(board, ai_y, ai_x, ai)
-		# display(board)
+		display(board)
 		
 		ai_win = is_winner(board, ai)
 		human_win = is_winner(board, human)
