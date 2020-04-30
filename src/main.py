@@ -1,12 +1,6 @@
 import copy, math, random
 from sys import maxsize
 
-board = [
-	[".", ".", "."],
-	[".", ".", "."],
-	[".", ".", "."]
-]
-
 ai = "X"
 human = "O"
 
@@ -58,25 +52,30 @@ def get_possible_moves(pos):
 	
 def is_terminal(pos):
 	return is_full(pos) or is_winner(pos, ai) or is_winner(pos, human)
+	 
+def get_static_evaluation(pos):
+	if is_winner(pos, ai) == True:
+		return [-1, -1, 1]
+	elif is_winner(pos, human) == True:
+		return [-1, -1, -1]
+	elif is_full(pos) == True:
+		return [-1, -1, 0]
+	else:
+		return [-1, -1, 0]
+	
 		
 def minimax(pos, depth, is_max):
-	term = is_terminal(pos)
+	static_eval = get_static_evaluation(pos)
 	
-	if depth == 0 or term == True:
-		if term == True:
-			if is_winner(pos, ai):
-				return [-1, -1, 100000000000]
-			elif is_winner(pos, human):
-				return [-1, -1, -100000000000]
-			elif is_full(pos):
-				return [-1, -1, 0]
-		else: # depth is 0
-			return [-1, -1, 0]
+	# return static evaluation only at terminal states
+	if depth == 0 or is_terminal(pos) == True:
+		return static_eval
 
-	if is_max == True: # maximising player
+	if is_max: # maximising player
 		value = -math.inf
 		row, col = random.choice(get_possible_moves(pos))
 		
+		# searching all children of current position
 		for i in range(len(pos)):
 			for j in range(len(pos[i])):
 				if pos[i][j] == ".":
@@ -84,12 +83,13 @@ def minimax(pos, depth, is_max):
 					b_copy[i][j] = ai
 					new_score = minimax(b_copy, depth - 1, False)[2]
 					
-					if new_score > value:
+					# choosing best move
+					if new_score < value:
 						value = new_score
-						col = j
 						row = i
+						col = j
 		
-		return [col, row, value]
+		return [row, col, value]
 		
 	else: # minimising player
 		value = math.inf
@@ -102,56 +102,73 @@ def minimax(pos, depth, is_max):
 					b_copy[i][j] = human
 					new_score = minimax(b_copy, depth - 1, True)[2]
 					
-					if new_score < value:
+					if new_score > value:
 						value = new_score
-						col = j
 						row = i
+						col = j
 	
-		return [col, row, value]
+		return [row, col, value]
 		
 def make_move(pos, y, x, symbol):
 	if pos[y][x] == ".":
 		pos[y][x] = symbol
 		
-while is_terminal(board) == False:
+num_draws = 0
+ai_1_wins = 0
+ai_2_wins = 0
 
-	human_y = int(input("Enter y: ")) - 1 # convert to board indices
-	human_x = int(input("Enter x: ")) - 1 # convert to board indices
-	make_move(board, human_y, human_x, human) # human
-	display(board)
-	
-	ai_win = is_winner(board, ai)
-	human_win = is_winner(board, human)
-	
-	if ai_win == human_win == True:
-		print ("Draw")
-		break
-	elif ai_win != human_win:
-		if ai_win == True:
-			print ("AI Win")
-			break
-		elif human_win == True:
-			print ("Human Win")
-			break
-	else:
-		pass
+for i in range(100):
+	board = [
+		[".", ".", "."],
+		[".", ".", "."],
+		[".", ".", "."]
+	]
+	while is_terminal(board) == False:
+
+		# human_y = int(input("Enter y: ")) - 1 # convert to board indices
+		# human_x = int(input("Enter x: ")) - 1 # convert to board indices
+		ai1_y, ai1_x, human_score = minimax(board, 3, False)
+		make_move(board, ai1_y, ai1_x, human) # ai1
+		# display(board)
 		
-	ai_x, ai_y, score = minimax(board, 2, True) # ai
-	make_move(board, ai_y, ai_x, ai)
-	display(board)
-	
-	ai_win = is_winner(board, ai)
-	human_win = is_winner(board, human)
-	
-	if ai_win == human_win == True:
-		print ("Draw")
-		break
-	elif ai_win != human_win:
-		if ai_win == True:
-			print ("AI Win")
+		ai_win = is_winner(board, ai)
+		human_win = is_winner(board, human)
+		
+		if ai_win != human_win:
+			if ai_win == True:
+				print ("AI Win")
+				ai_1_wins += 1
+				break
+			elif human_win == True:
+				print ("Human Win")
+				ai_2_wins +=1 
+				break
+		elif is_full(board) == True:
+			num_draws += 1
 			break
-		elif human_win == True:
-			print ("Human Win")
+		else:
+			pass
+			
+		ai_y, ai_x, score = minimax(board, 3, True) # ai2
+		make_move(board, ai_y, ai_x, ai)
+		# display(board)
+		
+		ai_win = is_winner(board, ai)
+		human_win = is_winner(board, human)
+		
+		if ai_win != human_win:
+			if ai_win == True:
+				print ("AI Win")
+				ai_1_wins += 1
+				break
+			elif human_win == True:
+				print ("Human Win")
+				ai_2_wins +=1 
+				break
+		elif is_full(board) == True:
+			num_draws += 1
 			break
-	else:
-		pass
+		else:
+			pass
+			
+print (num_draws, ai_1_wins, ai_2_wins)
